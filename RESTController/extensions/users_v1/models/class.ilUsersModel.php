@@ -132,6 +132,26 @@ class ilUsersModel
         $usrObj->update();
     }
 
+    public function bulkImport($xmlData)
+    {
+        
+        require_once "./Services/User/classes/class.ilUserImportParser.php";
+	// der importParser braucht AuthUtils. 
+	require_once "./Services/Authentication/classes/class.ilAuthUtils.php";
+	$parser = new ilUserImportParser();
+	$parser->setXMLContent($xmlData);
+	$parser->startParsing();
+
+        $retval = array();
+	var_dump($xmlData);
+	$retval['protocol'] =  $parser->getProtocol();
+	$retval['success'] = $parser->isSuccess();
+	$retval['num_users'] = $parser->getUserCount();
+	return $retval;
+
+    }
+
+
     /**
      * Checks if a user with a given login name owns the administration role.
      * @param $login
