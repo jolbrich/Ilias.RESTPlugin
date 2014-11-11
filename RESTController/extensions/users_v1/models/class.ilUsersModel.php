@@ -138,12 +138,15 @@ class ilUsersModel
         require_once "./Services/User/classes/class.ilUserImportParser.php";
 	// der importParser braucht AuthUtils. 
 	require_once "./Services/Authentication/classes/class.ilAuthUtils.php";
-	$parser = new ilUserImportParser();
+//* @param $xmlFile (ist Dateiname, oder leer fuer String, dann ->setXMLContent())
+//* @param int $a_mode IL_EXTRACT_ROLES | IL_USER_IMPORT | IL_VERIFY
+//* @param int $a_conflict_rue IL_FAIL_ON_CONFLICT | IL_UPDATE_ON_CONFLICT | IL_IGNORE_ON_CONFLICT
+	$parser = new ilUserImportParser(IL_VERIFY);
 	$parser->setXMLContent($xmlData);
 	$parser->startParsing();
 
         $retval = array();
-	var_dump($xmlData);
+//	var_dump($xmlData);
 	$retval['protocol'] =  $parser->getProtocol();
 	$retval['success'] = $parser->isSuccess();
 	$retval['num_users'] = $parser->getUserCount();

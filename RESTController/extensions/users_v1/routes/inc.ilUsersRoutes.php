@@ -69,6 +69,7 @@ $app->get('/v1/users/:user_id', 'authenticateTokenOnly', function ($user_id) use
 });
 
 $app->post('/v2/users', 'authenticateILIASAdminRole', function() use ($app) { // bulk import via XML
+// TODO: wie unterscheiden zwischen "einen User mit POST-Parametern" vs "viele User per XML"
 //TODO: ohne 'authenticate...' klappt schon init_curl.py nicht
   $request = $app->request();
   $importData = $request->params('importData');
@@ -76,7 +77,7 @@ $app->post('/v2/users', 'authenticateILIASAdminRole', function() use ($app) { //
   $model = new ilUsersModel();
   $import_result = $model->bulkImport($importData);
   
-  echo json_encode(array("message"=>$import_result));
+  echo json_encode($import_result);
 });
 
   
