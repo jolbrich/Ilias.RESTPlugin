@@ -132,6 +132,27 @@ class ilUsersModel
         $usrObj->update();
     }
 
+    public function bulkImport($xmlData)
+    {
+
+        require_once "./Services/User/classes/class.ilUserImportParser.php";
+        require_once "./Services/Authentication/classes/class.ilAuthUtils.php";
+	$parser = new ilUserImportParser();
+// TODO/Problem: can't pass mode in constructor if no file is given
+// can't verify first (like the web interface does).
+//        $parser->mode = IL_VERIFY;
+	$parser->setXMLContent($xmlData);
+	$parser->startParsing();
+
+        $retval = array();
+	$retval['protocol'] =  $parser->getProtocol();
+	$retval['success'] = $parser->isSuccess();
+	$retval['num_users'] = $parser->getUserCount();
+	return $retval;
+
+    }
+
+
     /**
      * Checks if a user with a given login name owns the administration role.
      * @param $login
