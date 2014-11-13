@@ -71,13 +71,12 @@ $app->get('/v1/users/:user_id', 'authenticateTokenOnly', function ($user_id) use
 // bulk import via XML
 // consumes the schema that is produced by Administration -> Users -> Export
 $app->post('/v1/users', 'authenticateILIASAdminRole', function() use ($app) {
-  $request = $app->request();
-  $importData = $request->getBody();
-
-  $model = new ilUsersModel();
-  $import_result = $model->bulkImport($importData);
-
-  echo json_encode($import_result);
+    $request = new ilRestRequest($app);
+    $importData = $request->getRaw();
+    $model = new ilUsersModel();
+    
+    $import_result = $model->bulkImport($importData);
+    echo json_encode($import_result);
 });
 
 
