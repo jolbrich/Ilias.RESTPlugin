@@ -132,7 +132,7 @@ class ilUsersModel
         $usrObj->update();
     }
 
-    public function bulkImport($xmlData)
+    public function bulkImport($xmlData, &$resp)
     {
 
         require_once "./Services/User/classes/class.ilUserImportParser.php";
@@ -144,11 +144,13 @@ class ilUsersModel
 	$parser->setXMLContent($xmlData);
 	$parser->startParsing();
 
-        $retval = array();
-	$retval['protocol'] =  $parser->getProtocol();
-	$retval['success'] = $parser->isSuccess();
-	$retval['num_users'] = $parser->getUserCount();
-	return $retval;
+    if ($parser->isSuccess) {
+        $resp->setCode(200);
+    } else {
+        $resp->setCode(400);
+    }
+    $resp->addData("ILIAS_protocol", $parser->getProtocol());
+    $resp->addData("num_users", $parser->getUserCount());
 
     }
 
