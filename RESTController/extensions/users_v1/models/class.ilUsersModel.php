@@ -132,25 +132,41 @@ class ilUsersModel
         $usrObj->update();
     }
 
+    /**
+     * Bulk import of users, using XML representation.
+     * Works similar to the web interface: first, the import data is validated
+     * (e.g. duplicate users). If successful, the data is imported.
+     * Otherwise, ILIAS' error log is returned.
+     */
     public function bulkImport($xmlData, &$resp)
     {
 
         require_once "./Services/User/classes/class.ilUserImportParser.php";
         require_once "./Services/Authentication/classes/class.ilAuthUtils.php";
-	$parser = new ilUserImportParser();
-// TODO/Problem: can't pass mode in constructor if no file is given
-// can't verify first (like the web interface does).
-//        $parser->mode = IL_VERIFY;
-	$parser->setXMLContent($xmlData);
-	$parser->startParsing();
+    	$parser = new ilUserImportParser();
+        // TODO/Problem: can't pass mode in constructor if no file is given
+        // $parser->mode = IL_VERIFY;
+    	$parser->setXMLContent($xmlData);
+        // Permissions are only checked if IL_VERIFY is given, but from this context,
+        // $ilAccess is null
+        // resulting in
+        // PHP Fatal error:  Call to a member function checkAccess() on a non-object in /opt/ilias/shared/ilias5_beta/Services/User/classes/class.ilUserImportParser.php on line 2033
+        $parser->startParsing();
 
-    if ($parser->isSuccess) {
-        $resp->setCode(200);
-    } else {
-        $resp->setCode(400);
-    }
-    $resp->addData("ILIAS_protocol", $parser->getProtocol());
-    $resp->addData("num_users", $parser->getUserCount());
+        if ($parser->isSuccess()) {
+//	        $parser = new ilUserImportParser();
+//	        $parser->setXMLContent($xmlData);
+//            $parser->startParsing();
+
+            $resp->setData("num_users", $parser->getUserCount());
+            $resp->setMessage("Import successful");
+            $resp->setCode(200);
+        } else {
+            $resp->setData("ILIAS_log", $parser->getProtocol());
+            $resp->setMessage("Import failed, nothing done").
+            $resp->setCode(400);
+        }
+
 
     }
 
